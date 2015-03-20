@@ -1,3 +1,6 @@
+event_event:
+    resource: "@EventBundle/Resources/config/routing/event.yml"
+
 event_homepage:
     path:     /hello/{firstName}/{count}
     defaults: { _controller: EventBundle:Default:index }
