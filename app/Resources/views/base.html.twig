@@ -2,11 +2,20 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>
+            
+            {%- if block('title') -%}
+                {{- block('title') -}} | Starwars Events
+            {%- else -%}
+                Events from a galaxy far far away
+            {%- endif -%}
+            
+        </title>
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('bundles/event/css/event.css') }}"/>
             <link rel="stylesheet" href="{{ asset('bundles/event/css/events.css') }}"/>
             <link rel="stylesheet" href="{{ asset('bundles/event/css/main.css') }}"/>
+            <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
