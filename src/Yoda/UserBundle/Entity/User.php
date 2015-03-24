@@ -4,14 +4,18 @@ namespace Yoda\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * User
  *
  * @ORM\Table(name="yoda_user")
  * @ORM\Entity(repositoryClass="Yoda\UserBundle\Entity\UserRepository")
+ * @UniqueEntity(fields="email", message="That email is taken!")
+ * @UniqueEntity(fields="username", message="That username is taken!")
  */
-class User implements AdvancedUserInterface
+class User implements AdvancedUserInterface, \Serializable
 {
     /**
      * @var integer
@@ -25,6 +29,8 @@ class User implements AdvancedUserInterface
     /**
      * @var string
      *
+     * @Assert\NotBlank(message="Enter a username")
+     * @Assert\Length(min=3, minMessage="Give us at least 3 characters")
      * @ORM\Column(name="username", type="string", length=255)
      */
     private $username;
@@ -32,7 +38,8 @@ class User implements AdvancedUserInterface
     /**
      * @var string
      * 
-     * @ORM\Column(name="email", type="string", length=255)
+     * @Assert\Email
+     * @ORM\Column(name="email", type="string", length=255, nullable=true)
      */
     private $email; 
 
@@ -42,6 +49,16 @@ class User implements AdvancedUserInterface
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
+    
+    /**
+     * @Assert\NotBlank
+     * @Assert\Regex(
+     *      pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$/",
+     *      message="Use 1 upper case letter, 1 lower case letter, and 1 number"
+     * )
+     * @var string 
+     */
+    private $plainPassword;
     
     /**
      * @var array
@@ -134,7 +151,7 @@ class User implements AdvancedUserInterface
     }
     
     public function eraseCredentials() {
-        //
+        $this->setPlainPassword(null);
     }
     
     public function getSalt() {
@@ -182,4 +199,35 @@ class User implements AdvancedUserInterface
     {
         return $this->email;
     }
+    
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+        ));
+    }
+
+    public function unserialize($serialized)
+    {
+        list(
+                $this->id, 
+                $this->username, 
+                $this->password
+        ) = unserialize($serialized);
+    }
+    
+    function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    function setPlainPassword($plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
+    }
+
+
+
 }

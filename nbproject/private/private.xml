@@ -3,14 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/EventBundle/DataFixtures/ORM/LoadEvents.php</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/EventBundle/Controller/EventController.php</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/EventBundle/Resources/views/Event/index.html.twig</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/app/AppKernel.php</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/composer.json</file>
+            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/UserBundle/Controller/RegisterController.php</file>
+            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/UserBundle/Entity/User.php</file>
+            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/UserBundle/Tests/Controller/RegisterControllerTest.php</file>
+            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/UserBundle/Form/RegisterFormType.php</file>
             <file>file:/Users/tom/Sites/symfony/starwarsevents/app/Resources/views/base.html.twig</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/EventBundle/Resources/config/routing/event.yml</file>
-            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/EventBundle/Resources/config/routing.yml</file>
+            <file>file:/Users/tom/Sites/symfony/starwarsevents/src/Yoda/UserBundle/Resources/views/Register/register.html.twig</file>
         </group>
     </open-files>
 </project-private>
