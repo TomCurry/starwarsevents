@@ -3,8 +3,6 @@
 namespace Yoda\EventBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Yoda\EventBundle\Entity\Event;
 use Yoda\EventBundle\Form\EventType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -26,7 +24,7 @@ class EventController extends Controller
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('EventBundle:Event')->findAll();
 
@@ -40,19 +38,24 @@ class EventController extends Controller
      */
     public function createAction(Request $request)
     {
-        $this->enforceUserSecurity();
+        $this->enforceUserSecurity('ROLE_EVENT_CREATE');
         
         $entity = new Event();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
+            $user = $this->getUser();
+            $entity->setOwner($user);
+            
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
             return $this->redirect($this->generateUrl('event_show', array('id' => $entity->getId())));
         }
+        
+        $this->enforceOwnerSecurity($entity);
 
         return $this->render('EventBundle:Event:new.html.twig', array(
             'entity' => $entity,
@@ -85,7 +88,7 @@ class EventController extends Controller
      */
     public function newAction()
     {
-        $this->enforceUserSecurity();
+        $this->enforceUserSecurity('ROLE_EVENT_CREATE');
         
         $entity = new Event();
         $form   = $this->createCreateForm($entity);
@@ -133,6 +136,8 @@ class EventController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Event entity.');
         }
+        
+        $this->enforceOwnerSecurity($entity);
 
         $editForm = $this->createEditForm($entity);
         $deleteForm = $this->createDeleteForm($id);
@@ -177,7 +182,8 @@ class EventController extends Controller
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Event entity.');
         }
-
+        
+        $this->enforceOwnerSecurity($entity);
         $deleteForm = $this->createDeleteForm($id);
         $editForm = $this->createEditForm($entity);
         $editForm->handleRequest($request);
@@ -212,6 +218,8 @@ class EventController extends Controller
             if (!$entity) {
                 throw $this->createNotFoundException('Unable to find Event entity.');
             }
+            
+            $this->enforceOwnerSecurity($entity);
 
             $em->remove($entity);
             $em->flush();
@@ -237,12 +245,21 @@ class EventController extends Controller
         ;
     }
     
-    private function enforceUserSecurity() {
-        $securityContext = $this->get('security.context');
-        if (!$securityContext->isGranted('ROLE_USER')) {
+    private function enforceUserSecurity($role = 'ROLE_USER') {
+
+        if (!$this->getSecurityContext()->isGranted($role)) {
             
             
-            throw new AccessDeniedException('Need ROLE_USER!');
+            throw new AccessDeniedException('Need '.$role);
+        }
+    }
+    
+    private function enforceOwnerSecurity(Event $event)
+    {
+        $user = $this->getUser();
+        
+        if ($user != $event->getOwner()) {
+            throw new AccessDeniedException('you do not own this!');
         }
     }
 }

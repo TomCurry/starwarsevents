@@ -7,9 +7,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Yoda\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
 
-class LoadEvents implements FixtureInterface, ContainerAwareInterface
+class LoadEvents implements FixtureInterface, ContainerAwareInterface, OrderedFixtureInterface
 {
     /**
      *
@@ -47,5 +48,11 @@ class LoadEvents implements FixtureInterface, ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null) {
         $this->container = $container;
     }
+    
+    public function getOrder()
+    {
+        return 10;
+    }
+
 }
 
