@@ -17,12 +17,16 @@ $container = $kernel->getContainer();
 $container->enterScope('request');
 $container->set('request', $request);
 
-$event = new Event();
-$event->setName('Darth\'s surprise birthday party!');
-$event->setLocation('Deathstar');
-$event->setTime(new \DateTime('tomorrow noon'));
-//$event->setDetails('Ha! Darth HATES surprises!!!!!');
+use Doctrine\ORM\EntityManager;
 
+/**
+ * @var EntityManager $em
+ */
 $em = $container->get('doctrine')->getManager();
-$em->persist($event);
-$em->flush();
+
+$wayne = $em->getRepository('UserBundle:User')
+    ->findOneByUsernameOrEmail('wayne');
+
+foreach ($wayne->getEvents() as $event) {
+    var_dump($event->getName());
+}

@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * User
@@ -74,6 +76,29 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(name="is_active", type="boolean")
      */
     private $isActive = true;
+    
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="Yoda\EventBundle\Entity\Event", mappedBy="owner") 
+     */
+    private $events;
+    
+    /**
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+    
+    /**
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
+    
+    public function __construct()
+    {
+        $this->events = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -228,7 +253,41 @@ class User implements AdvancedUserInterface, \Serializable
     {
         $this->plainPassword = $plainPassword;
     }
+    
+    public function getEvents()
+    {
+        return $this->events;
+    }
 
+    public function setEvents($events)
+    {
+        $this->events = $events;
+    }
+
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getUsername();
+    }
 
 
 }

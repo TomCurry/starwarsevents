@@ -4,6 +4,8 @@ namespace Yoda\EventBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Yoda\UserBundle\Entity\User;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Event
@@ -52,10 +54,45 @@ class Event
     
     /**
      *
-     * @ORM\ManyToOne(targetEntity="Yoda\UserBundle\Entity\User")
+     * @ORM\ManyToOne(
+     *      targetEntity="Yoda\UserBundle\Entity\User",
+     *      inversedBy="events"
+     * )
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $owner;
+    
+    /**
+     * @ORM\Column(name="slug", unique=true)
+     * @Gedmo\Slug(fields={"name"}, updatable=false)
+     */
+    private $slug;
+    
+    /**
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+    
+    /**
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $updatedAt;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Yoda\UserBundle\Entity\User")
+     * @ORM\JoinTable(
+     *      joinColumns={@ORM\JoinColumn(onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(onDelete="CASCADE")}
+     * )
+     */
+    private $attendees;
+    
+    public function __construct()
+    {
+        $this->attendees = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -176,6 +213,49 @@ class Event
     {
         $this->owner = $owner;
     }
+    
+    public function getSlug()
+    {
+        return $this->slug;
+    }
 
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+    }
+
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * 
+     * @return ArrayCollection
+     */
+    public function getAttendees()
+    {
+        return $this->attendees;
+    }
+
+    public function hasAttendee(User $user) 
+    {
+        return $this->getAttendees()->contains($user);
+    }
 
 }

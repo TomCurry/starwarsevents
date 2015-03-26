@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
 
-class LoadEvents implements FixtureInterface, ContainerAwareInterface, OrderedFixtureInterface
+class LoadUsers implements FixtureInterface, ContainerAwareInterface, OrderedFixtureInterface
 {
     /**
      *

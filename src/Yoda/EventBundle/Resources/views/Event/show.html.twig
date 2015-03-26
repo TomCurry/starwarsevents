@@ -22,6 +22,9 @@
                 <dl>
                     <dt>where:</dt>
                     <dd>{{ entity.location }}</dd>
+                    
+                    <dt>host:</dt>
+                    <dd>{{ entity.owner.username }}</dd>
 
                     <dt>when:</dt>
                     <dd>{{ entity.time | date('g:ia / l M j, Y') }}</dd>
@@ -31,12 +34,58 @@
 
                     <dt>who:</dt>
                     <dd>
+                        {{ entity.attendees|length }} attending!
                         <ul class="users">
-                            <li>nobody yet!</li>
+                            {% for attendee in entity.attendees %}
+                                {{ attendee }}
+                            {% else %}
+                                <li>RSVP!</li>
+                            {% endfor %}
                         </ul>
+                        
+                        {% if entity.hasAttendee(app.user) %}
+                            <a href="{{ path('event_unattend', {id: entity.id}) }}"
+                                class="btn btn-warning btn-xs js-attend-toggle">
+                                    I don't want to go!
+                            </a>
+                        {% else %}
+                            <a href="{{ path('event_attend', {id: entity.id}) }}"
+                                class="btn btn-success btn-xs js-attend-toggle">
+                                    I want to go!
+                            </a>
+                        {% endif %}
+                        
                     </dd>
                 </dl>
             </section>
         </article>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            $('.js-attend-toggle').on('click', function(e) {
+                //prevents the browser from "following" the link
+                e.preventDefault();
+                
+                var $anchor = $(this);
+                var url = $(this).attr('href')+'.json';
+                
+                $.post(url, null, function(data) {
+                    if (data.attending) {
+                        var message = 'See you there!';
+                    } else {
+                        var message = 'We\'ll miss you!';
+                    }
+                    
+                    $anchor.after('<span class="label label-default">&#10004; '+message+'</span>')
+                    $anchor.hide();
+                });
+                
+                return false;
+            });
+        });
+    </script>
 {% endblock %}

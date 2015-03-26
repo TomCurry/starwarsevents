@@ -1,0 +1,20 @@
+{% extends '::base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/user/css/login.css') }}" />
+{% endblock %}
+
+{% block body %}
+    <section class="login">
+        <article>
+            <h1>Ah crap!</h1>
+
+            <div>The servers are on fire! Grab a bucket! Send help!</div>
+        </article>
+    </section>
+    
+    <section class="events">
+        {{ render(controller('EventBundle:Event:_upcomingEvents', {'max': 1})) }}
+    </section>
+{% endblock %}

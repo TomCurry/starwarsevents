@@ -8,6 +8,7 @@ use Yoda\EventBundle\Form\EventType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Event controller.
@@ -24,14 +25,21 @@ class EventController extends Controller
      */
     public function indexAction()
     {
-         $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('EventBundle:Event')->findAll();
-
-        return array(
-            'entities' => $entities,
-        );
+        return array();
     }
+    
+    public function _upcomingEventsAction($max = null)
+    {
+        $em = $this->getDoctrine()->getManager();
+        
+        $events = $em->getRepository('EventBundle:Event')
+            ->getUpcomingEvents($max);
+        
+        return $this->render('EventBundle:Event:_upcomingEvents.html.twig', array(
+            'events' => $events,
+        ));
+    }
+    
     /**
      * Creates a new Event entity.
      *
@@ -52,7 +60,7 @@ class EventController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('event_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('event_show', array('slug' => $entity->getSlug())));
         }
         
         $this->enforceOwnerSecurity($entity);
@@ -103,17 +111,18 @@ class EventController extends Controller
      * Finds and displays a Event entity.
      *
      */
-    public function showAction($id)
+    public function showAction($slug)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('EventBundle:Event')->find($id);
+        $entity = $em->getRepository('EventBundle:Event')
+            ->findOneBy(array('slug' => $slug));
 
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Event entity.');
         }
 
-        $deleteForm = $this->createDeleteForm($id);
+        $deleteForm = $this->createDeleteForm($entity->getId());
 
         return $this->render('EventBundle:Event:show.html.twig', array(
             'entity'      => $entity,
@@ -245,21 +254,66 @@ class EventController extends Controller
         ;
     }
     
+    public function attendAction($id, $format)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $event = $em->getRepository('EventBundle:Event')->find($id);
+        
+        if(!$event) {
+            throw $this->createNotFoundException('Unable to find Event entity.');
+        }
+        
+        if(!$event->hasAttendee($this->getUser())) {
+            $event->getAttendees()->add($this->getUser());
+        }
+        $em->persist($event);
+        $em->flush();
+        
+        return $this->createAttendingResponse($event, $format);
+    }
+    
+    public function unattendAction($id, $format)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $event = $em->getRepository('EventBundle:Event')->find($id);
+        
+        if(!$event) {
+            throw $this->createNotFoundException('Unable to find Event entity.');
+        }
+        
+        if($event->hasAttendee($this->getUser())) {
+            $event->getAttendees()->removeElement($this->getUser());
+        }
+        $em->persist($event);
+        $em->flush();
+        
+        return $this->createAttendingResponse($event, $format);
+    }
+          
+    
     private function enforceUserSecurity($role = 'ROLE_USER') {
-
         if (!$this->getSecurityContext()->isGranted($role)) {
-            
-            
             throw new AccessDeniedException('Need '.$role);
         }
     }
     
-    private function enforceOwnerSecurity(Event $event)
+    private function createAttendingResponse(Event $event, $format)
     {
-        $user = $this->getUser();
-        
-        if ($user != $event->getOwner()) {
-            throw new AccessDeniedException('you do not own this!');
+        if ($format == 'json') {
+            $data = array(
+                'attending' => $event->hasAttendee($this->getUser()),
+            );
+            $response = new JsonResponse($data);
+            
+            return $response;
         }
+        
+        $url = $this->generateUrl('event_show', array(
+            'slug' => $event->getSlug()
+        ));
+        
+        return $this->redirect($url);
     }
+    
+    
 }

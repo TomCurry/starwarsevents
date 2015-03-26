@@ -3,7 +3,7 @@
 #    defaults: { _controller: "EventBundle:Event:index" }
 
 event_show:
-    path:     /{id}/show
+    path:     /{slug}/show
     defaults: { _controller: "EventBundle:Event:show" }
 
 event_new:
@@ -28,3 +28,15 @@ event_delete:
     path:     /{id}/delete
     defaults: { _controller: "EventBundle:Event:delete" }
     methods:  [POST, DELETE]
+    
+event_attend:
+    path:     /{id}/attend.{format}
+    defaults: { _controller: "EventBundle:Event:attend", format: html }
+    requirements:
+        format: json
+    
+event_unattend:
+    path:     /{id}/unattend.{format}
+    defaults: { _controller: "EventBundle:Event:unattend", format: html }
+    requirements:
+        format: json
