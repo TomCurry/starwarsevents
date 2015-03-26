@@ -4,6 +4,7 @@ namespace Yoda\EventBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Yoda\EventBundle\Reporting\EventReportManager;
 /**
  * Description of ReportController
  *
@@ -16,23 +17,9 @@ class ReportController extends Controller
      */
     public function updatedEventsActions()
     {
-        $em = $this->getDoctrine()->getManager();
+        $eventReportManager = $this->container->get('event_report_manager');
+        $content = $eventReportManager->getRecentlyUpdatedReport();
         
-        $events = $em->getRepository('EventBundle:Event')
-            ->getRecentlyUpdatedEvents();
-        
-        $rows = array();
-        foreach ($events as $event) {
-            $data = array(
-                $event->getId(),
-                $event->getName(),
-                $event->getTime()->format('Y-m-d H:i:s')
-            );
-            
-            $rows[] = implode(', ', $data);
-        }
-        
-        $content = implode("\n", $rows);
         $response = new Response($content);
         $response->headers->set('Content-Type', 'text/csv');
         
