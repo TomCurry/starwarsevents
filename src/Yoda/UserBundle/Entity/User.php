@@ -244,14 +244,20 @@ class User implements AdvancedUserInterface, \Serializable
         ) = unserialize($serialized);
     }
     
-    function getPlainPassword()
+    public function getPlainPassword()
     {
         return $this->plainPassword;
     }
 
-    function setPlainPassword($plainPassword)
+    /**
+     * 
+     * @param mixed $plainPassword
+     */
+    public function setPlainPassword($plainPassword)
     {
         $this->plainPassword = $plainPassword;
+        
+        $this->setPassword(null);
     }
     
     public function getEvents()
