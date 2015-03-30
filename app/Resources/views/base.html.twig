@@ -12,10 +12,19 @@
             
         </title>
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('bundles/event/css/event.css') }}"/>
-            <link rel="stylesheet" href="{{ asset('bundles/event/css/events.css') }}"/>
-            <link rel="stylesheet" href="{{ asset('bundles/event/css/main.css') }}"/>
             <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+            
+            {% stylesheets 
+                'bundles/event/css/event.css'
+                'bundles/event/css/events.css'
+                'bundles/event/css/main.css'
+                filter='cssrewrite'
+                filter='uglifycss'
+                output='css/built/layout.css'
+            %}
+                <link rel="stylesheet" href="{{ asset_url }}"/>
+            {% endstylesheets %}
+            
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>

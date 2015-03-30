@@ -9,3 +9,6 @@
 /composer.phar
 /vendor/
 /web/bundles/
+/web/css/built
+/web/js/built
+/node_modules
